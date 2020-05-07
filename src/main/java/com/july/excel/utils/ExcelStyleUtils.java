@@ -112,15 +112,14 @@ public class ExcelStyleUtils {
      * 设置默认样式
      * @param cellStyle
      * @param font
-     * @param fontSize
      * @return void
      * @author zengxueqi
      * @since 2020/5/6
      */
-    public static void setCellTitleStyle(CellStyle cellStyle, XSSFFont font, Integer fontSize) {
+    public static void setCellTitleStyle(CellStyle cellStyle, XSSFFont font, IndexedColors indexedColors) {
         cellStyle.setAlignment(HorizontalAlignment.CENTER);
         cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-        cellStyle.setFillForegroundColor(IndexedColors.SKY_BLUE.getIndex());
+        cellStyle.setFillForegroundColor(indexedColors.getIndex());
         cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         font.setFontName("宋体");
         font.setBold(true);

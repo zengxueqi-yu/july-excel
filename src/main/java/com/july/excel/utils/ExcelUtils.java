@@ -212,7 +212,7 @@ public class ExcelUtils {
         //设置列标题
         sxssfRow = sxssfSheet.createRow(jRow);
         CellStyle cellTitleStyle = sxssfWorkbook.createCellStyle();
-        ExcelStyleUtils.setCellTitleStyle(cellTitleStyle, font, excelData.getFontSize());
+        ExcelStyleUtils.setCellTitleStyle(cellTitleStyle, font, excelData.getIndexedColors());
         for (int i = 0; i < excelFields.size(); i++) {
             sxssfSheet.setColumnWidth(i, excelData.getCellWidth());
 

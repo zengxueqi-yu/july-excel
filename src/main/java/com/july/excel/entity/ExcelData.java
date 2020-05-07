@@ -1,8 +1,8 @@
 package com.july.excel.entity;
 
 import lombok.Data;
+import org.apache.poi.ss.usermodel.IndexedColors;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 
@@ -87,6 +87,10 @@ public class ExcelData {
      * 需要忽略生成excel的字段
      */
     public String[] ignores;
+    /**
+     * 背景颜色
+     */
+    public IndexedColors indexedColors = IndexedColors.SKY_BLUE;
 
     public Integer getFontSize() {
         if (fontSize == null) {
