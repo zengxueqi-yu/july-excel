@@ -1,7 +1,9 @@
 package com.july.excel.utils;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * 日期操作工具类
@@ -58,6 +60,21 @@ public class DateUtils {
         SimpleDateFormat sdf = new SimpleDateFormat(expectDateFormatStr == null ? style : expectDateFormatStr);
         String str = sdf.format(date);
         return str;
+    }
+
+    public static SimpleDateFormat getDateFormat(ThreadLocal<SimpleDateFormat> simpleDateFormatThreadLocal, String expectDateFormatStr) {
+        SimpleDateFormat format = simpleDateFormatThreadLocal.get();
+        if (format == null) {
+            //默认格式日期： "yyyy-MM-dd"
+            format = new SimpleDateFormat(expectDateFormatStr, Locale.getDefault());
+            simpleDateFormatThreadLocal.set(format);
+        }
+        return format;
+    }
+
+    public static String getDateFormatStr() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        return simpleDateFormat.format(new Date());
     }
 
 }

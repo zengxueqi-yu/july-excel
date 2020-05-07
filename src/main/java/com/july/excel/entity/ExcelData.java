@@ -16,21 +16,17 @@ import java.util.List;
 public class ExcelData {
 
     /**
-     * 导出数据必填
+     * 导出excel数据
      */
-    public List<List<String[]>> dataLists;
+    public List<?> excelData;
     /**
      * sheet名称必填
      */
-    public String[] sheetName;
+    public String sheetName;
     /**
      * 每个表格的大标题
      */
-    public String[] labelName;
-    /**
-     * 页面响应
-     */
-    public HttpServletResponse response;
+    public String labelName;
     /**
      * 自定义：单元格合并
      */
@@ -82,32 +78,25 @@ public class ExcelData {
     /**
      * 默认列宽大小：默认16
      */
-    public Integer defaultColumnWidth;
+    public Integer cellWidth = 20 * 256;
     /**
      * 默认字体大小：默认12号字体
      */
     public Integer fontSize;
+    /**
+     * 需要忽略生成excel的字段
+     */
+    public String[] ignores;
 
     public Integer getFontSize() {
         if (fontSize == null) {
-            fontSize = 12;
+            fontSize = 10;
         }
         return fontSize;
     }
 
     public void setFontSize(Integer fontSize) {
         this.fontSize = fontSize;
-    }
-
-    public Integer getDefaultColumnWidth() {
-        if (defaultColumnWidth == null) {
-            defaultColumnWidth = 16;
-        }
-        return defaultColumnWidth;
-    }
-
-    public void setDefaultColumnWidth(Integer defaultColumnWidth) {
-        this.defaultColumnWidth = defaultColumnWidth;
     }
 
     public void setDateFormatStr(String dateFormatStr) {

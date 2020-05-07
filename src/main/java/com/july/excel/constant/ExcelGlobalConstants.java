@@ -13,5 +13,8 @@ public class ExcelGlobalConstants {
     public static final Integer MAX_ROWSUM = 1048570;
     public static final Integer MAX_ROWSTYLE = 100000;
     public static final Integer DATE_LENGTH = 10;
+    public static final String XLS = "xls";
+    public static final String XLSX = "xlsx";
+    public static final Integer FONT_SIZE = 10;
 
 }
