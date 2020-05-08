@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 用于防止接口重复提交
+ * excel字段标记
  * @author cengxueqi
  * @since 2020/4/15
  */

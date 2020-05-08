@@ -30,16 +30,19 @@ public class ImageUtils {
      * @since 2020/5/6
      */
     public static Boolean patternIsImg(String str) {
-        String reg = ".+(.JPEG|.jpeg|.JPG|.jpg|.png|.gif)$";
+        if (StringUtils.isEmpty(str)) {
+            return false;
+        }
+        String reg = ".+(.JPEG|.jpeg|.JPG|.jpg|.PNG|.png|.gif)$";
         Pattern pattern = Pattern.compile(reg);
         Matcher matcher = pattern.matcher(str);
-        Boolean temp = matcher.find();
-        return temp;
+        Boolean isPicture = matcher.find();
+        return isPicture;
     }
 
     /**
      * 画图片
-     * @param wb
+     * @param sxssfWorkbook
      * @param sxssfDrawing
      * @param pictureUrl
      * @param colIndex
@@ -48,7 +51,7 @@ public class ImageUtils {
      * @author zengxueqi
      * @since 2020/5/6
      */
-    public static void drawPicture(SXSSFWorkbook wb, SXSSFDrawing sxssfDrawing, String pictureUrl, int colIndex, int rowIndex) {
+    public static void drawPicture(SXSSFWorkbook sxssfWorkbook, SXSSFDrawing sxssfDrawing, String pictureUrl, int colIndex, int rowIndex) {
         //rowIndex代表当前行
         try {
             if (pictureUrl != null) {
@@ -62,7 +65,7 @@ public class ImageUtils {
                 //设置图片大小，
                 XSSFClientAnchor anchor = new XSSFClientAnchor(0, 0, 50, 50, colIndex, rowIndex, colIndex + 1, rowIndex + 1);
                 anchor.setAnchorType(DONT_MOVE_AND_RESIZE);
-                sxssfDrawing.createPicture(anchor, wb.addPicture(data, XSSFWorkbook.PICTURE_TYPE_JPEG));
+                sxssfDrawing.createPicture(anchor, sxssfWorkbook.addPicture(data, XSSFWorkbook.PICTURE_TYPE_JPEG));
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -78,8 +78,6 @@ public class ExcelOperations {
             excelOperations = new ExcelOperations();
             UTILS_THREAD_LOCAL.set(excelOperations);
         }
-        long startTime = System.currentTimeMillis();
-        log.info("===> Excel tool class export start run!");
         List<String> excelTitles = new ArrayList<>();
         try {
             List<R> returnDataList = new ArrayList<>();
@@ -119,7 +117,6 @@ public class ExcelOperations {
                     returnDataList.add(object);
                 }
             }
-            log.info("===> Excel tool class export run time:" + (System.currentTimeMillis() - startTime) + " ms!");
             return returnDataList;
         } catch (Exception e) {
             log.debug("===> Exception Message：Excel tool class export exception !");
@@ -161,49 +158,49 @@ public class ExcelOperations {
      * @since 2020/5/7
      */
     private static String getCellVal(Cell cell, ExcelData excelData) {
-        String val = null;
+        String value = null;
         if (cell != null) {
             CellType cellType = cell.getCellType();
             switch (cellType) {
                 case NUMERIC:
                     if (DateUtil.isCellDateFormatted(cell)) {
-                        val = DateUtils.getDateFormat(simpleDateFormatThreadLocal, excelData.getExpectDateFormatStr()).format(cell.getDateCellValue());
+                        value = DateUtils.getDateFormat(simpleDateFormatThreadLocal, excelData.getExpectDateFormatStr()).format(cell.getDateCellValue());
                     } else {
-                        val = NumberUtils.getDecimalFormat(decimalFormatThreadLocal, excelData.getNumeralFormat()).format(cell.getNumericCellValue());
+                        value = NumberUtils.getDecimalFormat(decimalFormatThreadLocal, excelData.getNumeralFormat()).format(cell.getNumericCellValue());
                     }
                     break;
                 case STRING:
                     if (cell.getStringCellValue().trim().length() >= ExcelGlobalConstants.DATE_LENGTH
                             && DateUtils.verificationDate(cell.getStringCellValue(), excelData.getDateFormatStr())) {
-                        val = DateUtils.strToDateFormat(cell.getStringCellValue(), excelData.getDateFormatStr(),
+                        value = DateUtils.strToDateFormat(cell.getStringCellValue(), excelData.getDateFormatStr(),
                                 excelData.getExpectDateFormatStr());
                     } else {
-                        val = cell.getStringCellValue();
+                        value = cell.getStringCellValue();
                     }
                     break;
                 case BOOLEAN:
-                    val = String.valueOf(cell.getBooleanCellValue());
+                    value = String.valueOf(cell.getBooleanCellValue());
                     break;
                 case BLANK:
-                    val = cell.getStringCellValue();
+                    value = cell.getStringCellValue();
                     break;
                 case ERROR:
-                    val = "错误";
+                    value = "错误";
                     break;
                 case FORMULA:
                     try {
-                        val = String.valueOf(cell.getStringCellValue());
+                        value = String.valueOf(cell.getStringCellValue());
                     } catch (IllegalStateException e) {
-                        val = String.valueOf(cell.getNumericCellValue());
+                        value = String.valueOf(cell.getNumericCellValue());
                     }
                     break;
                 default:
-                    val = cell.getRichStringCellValue() == null ? null : cell.getRichStringCellValue().toString();
+                    value = cell.getRichStringCellValue() == null ? null : cell.getRichStringCellValue().toString();
             }
         } else {
-            val = "";
+            value = "";
         }
-        return val;
+        return value;
     }
 
 }

@@ -6,6 +6,7 @@ import com.july.excel.entity.ExcelDropDown;
 import com.july.excel.entity.ExcelField;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.streaming.SXSSFDrawing;
 import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -74,12 +75,12 @@ public class ExcelUtils {
         if (excelData.getSheetName() == null) {
             log.debug("===> Exception Message：Export sheet(type:String[]) name cannot be empty!");
         }
-
         int k = 0;
         SXSSFSheet sxssfSheet = sxssfWorkbook.createSheet();
         sxssfWorkbook.setSheetName(k, excelData.getSheetName());
         CellStyle cellStyle = sxssfWorkbook.createCellStyle();
         XSSFFont font = (XSSFFont) sxssfWorkbook.createFont();
+        SXSSFDrawing sxssfDrawing = sxssfSheet.createDrawingPatriarch();
 
         int jRow = 0;
         //自定义：大标题
@@ -119,7 +120,13 @@ public class ExcelUtils {
             for (int j = 0, headSize = excelFields.size(); j < headSize; j++) {
                 Field field = excelFields.get(j);
                 Object value = BeanUtils.getFieldValue(excelObject, field);
-                Cell cell = createCell(sxssfRow, j, (String) value);
+                Cell cell = null;
+                if (ImageUtils.patternIsImg((String) value)) {
+                    cell = createCell(sxssfRow, j, " ");
+                    ImageUtils.drawPicture(sxssfWorkbook, sxssfDrawing, (String) value, j, jRow);
+                } else {
+                    cell = createCell(sxssfRow, j, (String) value);
+                }
                 cell.setCellStyle(cellStyle);
             }
             jRow++;
@@ -143,22 +150,8 @@ public class ExcelUtils {
                 outputStream.close();
             }
         } catch (Exception e) {
-            log.info(" Andyczy ExcelUtils Exception Message：Output stream is not empty !");
+            log.info("===> Exception Message：Output stream is not empty !");
             e.getSuppressed();
-        }
-    }
-
-    /**
-     * 锁定行（固定表头）
-     * @param sxssfSheet
-     * @param row
-     * @return void
-     * @author zengxueqi
-     * @since 2020/5/6
-     */
-    public static void createFreezePane(SXSSFSheet sxssfSheet, Integer row) {
-        if (row != null && row > 0) {
-            sxssfSheet.createFreezePane(0, row, 0, 1);
         }
     }
 
