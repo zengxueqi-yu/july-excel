@@ -20,41 +20,21 @@ public class ExcelData {
      */
     public List<?> excelData;
     /**
-     * sheet名称必填
+     * sheet名称(多个时，逗号分开)
      */
-    public String sheetName;
+    public String sheetName = "sheet1";
     /**
      * 每个表格的大标题
      */
     public String labelName;
     /**
-     * 自定义：单元格合并
+     * 自定义：单元格合并[{1,1,2,5}]
      */
-    public HashMap regionMap;
-    /**
-     * 自定义：对每个单元格自定义列宽
-     */
-    public HashMap mapColumnWidth;
-    /**
-     * 自定义：每一个单元格样式
-     */
-    public HashMap styles;
-    /**
-     * 自定义：固定表头
-     */
-    public HashMap paneMap;
-    /**
-     * 自定义：某一行样式
-     */
-    public HashMap rowStyles;
-    /**
-     * 自定义：某一列样式
-     */
-    public HashMap columnStyles;
+    public List<ExcelRegion> excelRegions;
     /**
      * 自定义：对每个单元格自定义下拉列表
      */
-    public HashMap dropDownMap;
+    public List<ExcelDropDown> excelDropDowns;
     /**
      * 文件名称
      */
@@ -88,9 +68,17 @@ public class ExcelData {
      */
     public String[] ignores;
     /**
+     * excel导入数据开始行数(多单元从第几行开始获取数据，默认从第二行开始获取（可为空，如 [{sheeNum=1,rowNum=3}]; 第一个表格从第三行开始获取）)
+     */
+    public Integer exportStartRowNum = 0;
+    /**
      * 背景颜色
      */
     public IndexedColors indexedColors = IndexedColors.SKY_BLUE;
+    /**
+     * 从哪个sheet的，多少行开始读取数据
+     */
+    public List<ExcelReadData> excelReadDataList;
 
     public Integer getFontSize() {
         if (fontSize == null) {

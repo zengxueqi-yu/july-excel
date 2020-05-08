@@ -1,6 +1,7 @@
 package com.july.excel.utils;
 
 import com.july.excel.constant.ExcelGlobalConstants;
+import com.july.excel.entity.ExcelRegion;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFRow;
@@ -128,46 +129,16 @@ public class ExcelStyleUtils {
     }
 
     /**
-     * 自定义列宽
-     * @param sxssfSheet
-     * @param map
-     * @return void
-     * @author zengxueqi
-     * @since 2020/5/6
-     */
-    public static void setColumnWidth(SXSSFSheet sxssfSheet, HashMap map) {
-        if (map != null) {
-            Iterator iterator = map.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry entry = (Map.Entry) iterator.next();
-                Object key = entry.getKey();
-                Object val = entry.getValue();
-                sxssfSheet.setColumnWidth((int) key, (int) val * 512);
-            }
-        }
-    }
-
-    /**
-     * excel 合并单元格
+     * excel合并单元格
      * @param sheet
-     * @param rowColList
+     * @param excelRegions
      * @return void
      * @author zengxueqi
      * @since 2020/5/6
      */
-    public static void setMergedRegion(SXSSFSheet sheet, ArrayList<Integer[]> rowColList) {
-        if (rowColList != null && rowColList.size() > 0) {
-            for (int i = 0; i < rowColList.size(); i++) {
-                Integer[] str = rowColList.get(i);
-                if (str.length > 0 && str.length == 4) {
-                    Integer firstRow = str[0];
-                    Integer lastRow = str[1];
-                    Integer firstCol = str[2];
-                    Integer lastCol = str[3];
-                    setMergedRegion(sheet, firstRow, lastRow, firstCol, lastCol);
-                }
-            }
-        }
+    public static void setMergedRegion(SXSSFSheet sheet, List<ExcelRegion> excelRegions) {
+        excelRegions.stream().forEach(excelRegion -> setMergedRegion(sheet, excelRegion.getStartRowNum(),
+                excelRegion.getEndRowNum(), excelRegion.getStartColumnNum(), excelRegion.getEndColumnNum()));
     }
 
     /**

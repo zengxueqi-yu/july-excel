@@ -56,4 +56,22 @@ public class BeanUtils {
         }
     }
 
+    /**
+     * 给字段赋值
+     * @param o
+     * @param field
+     * @param value
+     * @return void
+     * @author zengxueqi
+     * @since 2020/5/8
+     */
+    public static void setFieldValue(Object o, Field field, Object value) {
+        try {
+            field.setAccessible(true);
+            field.set(o, value);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

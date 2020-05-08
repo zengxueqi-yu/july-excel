@@ -1,17 +1,14 @@
 package com.july.excel.excel;
 
-import com.july.excel.constant.ExcelGlobalConstants;
 import com.july.excel.entity.ExcelData;
 import com.july.excel.entity.ExcelReadData;
 import com.july.excel.utils.DateUtils;
 import com.july.excel.utils.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -25,25 +22,15 @@ public class ExcelFactory {
     /**
      * 导入excel信息
      * @param inputStream
-     * @param fileName
-     * @param sheetName
-     * @param excelReadDataList
+     * @param excelClass
      * @return java.util.List<java.util.List < java.util.LinkedHashMap < java.lang.String, java.lang.String>>>
      * @author zengxueqi
      * @since 2020/5/7
      */
-    public static List<List<LinkedHashMap<String, String>>> importExcelData(InputStream inputStream, String fileName,
-                                                                            String[] sheetName, List<ExcelReadData> excelReadDataList) throws Exception {
-        String extName = fileName.substring(fileName.lastIndexOf('.') + 1);
-        Workbook workbook = null;
-        if (ExcelGlobalConstants.XLS.equals(extName)) {
-            workbook = new HSSFWorkbook(inputStream);
-        } else if (ExcelGlobalConstants.XLSX.equals(extName)) {
-            workbook = new XSSFWorkbook(inputStream);
-        } else {
-            throw new Exception("无法识别的Excel文件，请重新选择Excel模版进行导入!");
+    public static <R> List<R> importExcelData(InputStream inputStream, Class<R> excelClass, ExcelData excelData) throws Exception {
+        try (Workbook workbook = WorkbookFactory.create(inputStream)) {
+            return ExcelOperations.importForExcelData(workbook, excelClass, excelData);
         }
-        return ExcelOperations.importForExcelData(workbook, sheetName, excelReadDataList);
     }
 
     /**

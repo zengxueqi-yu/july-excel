@@ -2,10 +2,10 @@ package com.july.excel.utils;
 
 import com.july.excel.constant.ExcelGlobalConstants;
 import com.july.excel.entity.ExcelData;
+import com.july.excel.entity.ExcelDropDown;
 import com.july.excel.entity.ExcelField;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
-import org.apache.poi.xssf.streaming.SXSSFDrawing;
 import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -33,106 +33,6 @@ import static org.apache.poi.ss.util.CellUtil.createCell;
 public class ExcelUtils {
 
     private static Logger log = LoggerFactory.getLogger(ExcelUtils.class);
-
-    /**
-     * 设置数据：有样式（行、列、单元格样式）
-     * @param wb
-     * @param sxssfRow
-     * @param excelData
-     * @return void
-     * @author zengxueqi
-     * @since 2020/5/6
-     */
-    public static void setDataList(SXSSFWorkbook wb, SXSSFRow sxssfRow, ExcelData excelData, List<Field> excelFields) {
-        if (CollectionUtils.isEmpty(excelData.getExcelData())) {
-            log.debug("===> Exception Message：Export data(type:List<List<String[]>>) cannot be empty!");
-        }
-        if (excelData.getSheetName() == null) {
-            log.debug("===> Exception Message：Export sheet(type:String[]) name cannot be empty!");
-        }
-        int k = 0;
-        SXSSFSheet sxssfSheet = wb.createSheet();
-        sxssfSheet.setDefaultColumnWidth(excelData.getCellWidth());
-        wb.setSheetName(k, excelData.getSheetName());
-        CellStyle cellStyle = wb.createCellStyle();
-        XSSFFont font = (XSSFFont) wb.createFont();
-        SXSSFDrawing sxssfDrawing = sxssfSheet.createDrawingPatriarch();
-
-        int jRow = 0;
-
-        //自定义：大标题（看该方法说明）。
-        jRow = ExcelStyleUtils.setLabelName(jRow, wb, excelData.getLabelName(), sxssfRow, sxssfSheet, excelFields);
-
-        //自定义：每个表格固定表头（看该方法说明）。
-        Integer pane = 1;
-        if (!CollectionUtils.isEmpty(excelData.getPaneMap()) && excelData.getPaneMap().get(k + 1) != null) {
-            pane = (Integer) excelData.getPaneMap().get(k + 1) + (excelData.getLabelName() != null ? 1 : 0);
-            createFreezePane(sxssfSheet, pane);
-        }
-        //自定义：每个单元格自定义合并单元格：对每个单元格自定义合并单元格（看该方法说明）。
-        if (!CollectionUtils.isEmpty(excelData.getRegionMap())) {
-            ExcelStyleUtils.setMergedRegion(sxssfSheet, (ArrayList<Integer[]>) excelData.getRegionMap().get(k + 1));
-        }
-        //自定义：每个单元格自定义下拉列表：对每个单元格自定义下拉列表（看该方法说明）。
-        if (!CollectionUtils.isEmpty(excelData.getDropDownMap())) {
-            setDataValidation(sxssfSheet, (List<String[]>) excelData.getDropDownMap().get(k + 1), excelData.getExcelData().size());
-        }
-        //自定义：每个表格自定义列宽：对每个单元格自定义列宽（看该方法说明）。
-        if (!CollectionUtils.isEmpty(excelData.getMapColumnWidth())) {
-            ExcelStyleUtils.setColumnWidth(sxssfSheet, (HashMap) excelData.getMapColumnWidth().get(k + 1));
-        }
-        //默认样式。
-        ExcelStyleUtils.setCellMainStyle(cellStyle, font, excelData.getFontSize());
-
-        //设置列标题
-        sxssfRow = sxssfSheet.createRow(jRow);
-        for (int i = 0; i < excelFields.size(); i++) {
-            Field field = excelFields.get(i);
-            ExcelField excelField = field.getAnnotation(ExcelField.class);
-            Cell cell = createCell(sxssfRow, i, excelField.value());
-            cell.setCellStyle(cellStyle);
-        }
-        jRow += 1;
-
-        //写入小标题与数据。
-        Integer SIZE = excelData.getExcelData().size() < ExcelGlobalConstants.MAX_ROWSUM ? excelData.getExcelData().size() : ExcelGlobalConstants.MAX_ROWSUM;
-        Integer MAXSYTLE = excelData.getExcelData().size() < ExcelGlobalConstants.MAX_ROWSTYLE ? excelData.getExcelData().size() : ExcelGlobalConstants.MAX_ROWSTYLE;
-        for (int i = 0; i < SIZE; i++) {
-            Object excelObject = excelData.getExcelData().get(i);
-            sxssfRow = sxssfSheet.createRow(jRow);
-            for (int j = 0, headSize = excelFields.size(); j < headSize; j++) {
-                Field field = excelFields.get(j);
-                Object value = BeanUtils.getFieldValue(excelObject, field);
-                //样式过多会导致GC内存溢出！
-                try {
-                    Cell cell = null;
-                    if (ImageUtils.patternIsImg((String) excelObject)) {
-                        cell = createCell(sxssfRow, j, " ");
-                        ImageUtils.drawPicture(wb, sxssfDrawing, (String) excelObject, j, jRow);
-                    } else {
-                        cell = createCell(sxssfRow, j, (String) excelObject);
-                    }
-                    cell.setCellStyle(cellStyle);
-
-                    //自定义：每个表格每一列的样式（看该方法说明）。
-                    if (excelData.getColumnStyles() != null && jRow >= pane && i <= MAXSYTLE) {
-                        ExcelStyleUtils.setExcelRowStyles(cell, wb, sxssfRow, (List) excelData.getColumnStyles().get(k + 1), j);
-                    }
-                    //自定义：每个表格每一行的样式（看该方法说明）。
-                    if (excelData.getRowStyles() != null && i <= MAXSYTLE) {
-                        ExcelStyleUtils.setExcelRowStyles(cell, wb, sxssfRow, (List) excelData.getRowStyles().get(k + 1), jRow);
-                    }
-                    //自定义：每一个单元格样式（看该方法说明）。
-                    if (excelData.getStyles() != null && i <= MAXSYTLE) {
-                        ExcelStyleUtils.setExcelStyles(cell, wb, sxssfRow, (List<List<Object[]>>) excelData.getStyles().get(k + 1), j, i);
-                    }
-                } catch (Exception e) {
-                    log.debug("===> Exception Message：The maximum number of cell styles was exceeded. You can define up to 4000 styles!");
-                }
-            }
-            jRow++;
-        }
-    }
 
     /**
      * 流操作
@@ -167,7 +67,7 @@ public class ExcelUtils {
      * @author zengxueqi
      * @since 2020/5/6
      */
-    public static void setDataListNoStyle(SXSSFWorkbook sxssfWorkbook, SXSSFRow sxssfRow, ExcelData excelData, List<Field> excelFields) {
+    public static void setDataList(SXSSFWorkbook sxssfWorkbook, SXSSFRow sxssfRow, ExcelData excelData, List<Field> excelFields) {
         if (CollectionUtils.isEmpty(excelData.getExcelData())) {
             log.debug("===> Exception Message：Export data(type:List<List<String[]>>) cannot be empty!");
         }
@@ -182,31 +82,21 @@ public class ExcelUtils {
         XSSFFont font = (XSSFFont) sxssfWorkbook.createFont();
 
         int jRow = 0;
-        //自定义：大标题（看该方法说明）。
+        //自定义：大标题
         jRow = ExcelStyleUtils.setLabelName(jRow, sxssfWorkbook, excelData.getLabelName(), sxssfRow, sxssfSheet, excelFields);
 
-        //自定义：每个表格固定表头（看该方法说明）。
-        Integer pane = 1;
-        if (!CollectionUtils.isEmpty(excelData.getPaneMap()) && excelData.getPaneMap().get(k + 1) != null) {
-            pane = (Integer) excelData.getPaneMap().get(k + 1) + (excelData.getLabelName() != null ? 1 : 0);
-            createFreezePane(sxssfSheet, pane);
+        //自定义：每个单元格自定义合并单元格：对每个单元格自定义合并单元格（看该方法说明）
+        if (!CollectionUtils.isEmpty(excelData.getExcelRegions())) {
+            ExcelStyleUtils.setMergedRegion(sxssfSheet, excelData.getExcelRegions());
         }
-        //自定义：每个单元格自定义合并单元格：对每个单元格自定义合并单元格（看该方法说明）。
-        if (!CollectionUtils.isEmpty(excelData.getRegionMap())) {
-            ExcelStyleUtils.setMergedRegion(sxssfSheet, (ArrayList<Integer[]>) excelData.getRegionMap().get(k + 1));
+        //自定义：每个单元格自定义下拉列表：对每个单元格自定义下拉列表（看该方法说明）
+        if (!CollectionUtils.isEmpty(excelData.getExcelDropDowns())) {
+            setDropDownData(sxssfSheet, excelData.getExcelDropDowns(), excelData.getExcelData().size());
         }
-        //自定义：每个单元格自定义下拉列表：对每个单元格自定义下拉列表（看该方法说明）。
-        if (!CollectionUtils.isEmpty(excelData.getDropDownMap())) {
-            setDataValidation(sxssfSheet, (List<String[]>) excelData.getDropDownMap().get(k + 1), excelData.getExcelData().size());
-        }
-        //自定义：每个表格自定义列宽：对每个单元格自定义列宽（看该方法说明）。
-        if (!CollectionUtils.isEmpty(excelData.getMapColumnWidth())) {
-            ExcelStyleUtils.setColumnWidth(sxssfSheet, (HashMap) excelData.getMapColumnWidth().get(k + 1));
-        }
-        //默认样式。
+        //默认样式
         ExcelStyleUtils.setCellMainStyle(cellStyle, font, excelData.getFontSize());
 
-        //写入小标题与数据。
+        //写入小标题与数据
         Integer SIZE = excelData.getExcelData().size() < ExcelGlobalConstants.MAX_ROWSUM ? excelData.getExcelData().size() : ExcelGlobalConstants.MAX_ROWSUM;
 
         //设置列标题
@@ -253,7 +143,7 @@ public class ExcelUtils {
                 outputStream.close();
             }
         } catch (Exception e) {
-            System.out.println(" Andyczy ExcelUtils Exception Message：Output stream is not empty !");
+            log.info(" Andyczy ExcelUtils Exception Message：Output stream is not empty !");
             e.getSuppressed();
         }
     }
@@ -275,17 +165,18 @@ public class ExcelUtils {
     /**
      * 下拉列表
      * @param sheet
-     * @param dropDownListData
+     * @param excelDropDowns
      * @param dataListSize
      * @return void
      * @author zengxueqi
      * @since 2020/5/6
      */
-    public static void setDataValidation(SXSSFSheet sheet, List<String[]> dropDownListData, int dataListSize) {
-        if (dropDownListData.size() > 0) {
-            for (int col = 0; col < dropDownListData.get(0).length; col++) {
-                Integer colv = Integer.parseInt(dropDownListData.get(0)[col]);
-                setDataValidation(sheet, dropDownListData.get(col + 1), 1, dataListSize < 100 ? 500 : dataListSize, colv, colv);
+    public static void setDropDownData(SXSSFSheet sheet, List<ExcelDropDown> excelDropDowns, int dataListSize) {
+        if (!CollectionUtils.isEmpty(excelDropDowns)) {
+            for (int i = 0; i < excelDropDowns.size(); i++) {
+                ExcelDropDown excelDropDown = excelDropDowns.get(i);
+                setDropDownData(sheet, excelDropDown.getDropDownData(), 1, dataListSize < 100 ? 500 : dataListSize,
+                        excelDropDown.getColumnNum(), excelDropDown.getColumnNum());
             }
         }
     }
@@ -293,7 +184,7 @@ public class ExcelUtils {
     /**
      * 下拉列表
      * @param xssfWsheet
-     * @param list
+     * @param dropDownData
      * @param firstRow
      * @param lastRow
      * @param firstCol
@@ -302,10 +193,10 @@ public class ExcelUtils {
      * @author zengxueqi
      * @since 2020/5/6
      */
-    public static void setDataValidation(SXSSFSheet xssfWsheet, String[] list, Integer firstRow, Integer lastRow, Integer firstCol, Integer lastCol) {
+    public static void setDropDownData(SXSSFSheet xssfWsheet, List<String> dropDownData, Integer firstRow, Integer lastRow, Integer firstCol, Integer lastCol) {
         DataValidationHelper helper = xssfWsheet.getDataValidationHelper();
         CellRangeAddressList addressList = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);
-        DataValidationConstraint constraint = helper.createExplicitListConstraint(list);
+        DataValidationConstraint constraint = helper.createExplicitListConstraint(dropDownData.toArray(new String[dropDownData.size()]));
         DataValidation dataValidation = helper.createValidation(constraint, addressList);
         dataValidation.createErrorBox(ExcelGlobalConstants.DataValidationError1, ExcelGlobalConstants.DataValidationError2);
         //处理Excel兼容性问题

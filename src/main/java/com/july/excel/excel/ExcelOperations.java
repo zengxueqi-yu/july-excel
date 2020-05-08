@@ -2,7 +2,7 @@ package com.july.excel.excel;
 
 import com.july.excel.constant.ExcelGlobalConstants;
 import com.july.excel.entity.ExcelData;
-import com.july.excel.entity.ExcelReadData;
+import com.july.excel.entity.ExcelField;
 import com.july.excel.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
@@ -48,15 +48,8 @@ public class ExcelOperations {
         SXSSFRow sxssfRow = null;
         try {
             List<Field> hasExcelFieldList = BeanUtils.getExcelFields(excelClass, excelData.getIgnores());
-            //设置数据
-            if (CollectionUtils.isEmpty(excelData.getStyles())
-                    || CollectionUtils.isEmpty(excelData.getRowStyles())
-                    || CollectionUtils.isEmpty(excelData.getColumnStyles())) {
-                setDataListNoStyle(sxssfWorkbook, sxssfRow, excelData, hasExcelFieldList);
-            } else {
-                setDataList(sxssfWorkbook, sxssfRow, excelData, hasExcelFieldList);
-            }
-            ExcelUtils.setExcelResponse(sxssfWorkbook, outputStream, excelData,httpServletResponse);
+            setDataList(sxssfWorkbook, sxssfRow, excelData, hasExcelFieldList);
+            ExcelUtils.setExcelResponse(sxssfWorkbook, outputStream, excelData, httpServletResponse);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -66,15 +59,20 @@ public class ExcelOperations {
 
     /**
      * excel 模板数据导入
-     * @param book              Workbook对象（不可为空）
-     * @param sheetName         多单元数据获取（不可为空）
-     * @param excelReadDataList 多单元从第几行开始获取数据，默认从第二行开始获取（可为空，如 [{sheeNum=1,rowNum=3}]; 第一个表格从第三行开始获取）
+     * @param book      Workbook对象（不可为空）
+     * @param excelData
      * @return java.util.List<java.util.List < java.util.LinkedHashMap < java.lang.String, java.lang.String>>>
      * @author zengxueqi
      * @since 2020/5/7
      */
-    @SuppressWarnings({"deprecation", "rawtypes"})
-    public static List<List<LinkedHashMap<String, String>>> importForExcelData(Workbook book, String[] sheetName, List<ExcelReadData> excelReadDataList) {
+    public static <R> List<R> importForExcelData(Workbook book, Class<R> excelClass, ExcelData excelData) {
+        List<Field> excelFields = BeanUtils.getExcelFields(excelClass, null);
+        Map<String, Field> hasAnnotationFieldMap = new HashMap<>();
+        excelFields.stream().forEach(field -> {
+            ExcelField excelField = field.getAnnotation(ExcelField.class);
+            hasAnnotationFieldMap.put(excelField.value(), field);
+        });
+        R object = null;
         ExcelOperations excelOperations = UTILS_THREAD_LOCAL.get();
         if (excelOperations == null) {
             excelOperations = new ExcelOperations();
@@ -82,39 +80,44 @@ public class ExcelOperations {
         }
         long startTime = System.currentTimeMillis();
         log.info("===> Excel tool class export start run!");
-        ExcelData excelData = new ExcelData();
+        List<String> excelTitles = new ArrayList<>();
         try {
-            List<List<LinkedHashMap<String, String>>> returnDataList = new ArrayList<>();
-            for (int k = 0; k <= sheetName.length - 1; k++) {
+            List<R> returnDataList = new ArrayList<>();
+            for (int k = 0; k <= excelData.getSheetName().split(",").length - 1; k++) {
                 //得到第K个工作表对象、得到第K个工作表中的总行数。
                 Sheet sheet = book.getSheetAt(k);
                 int rowCount = sheet.getLastRowNum() + 1;
                 Row valueRow = null;
 
-                List<LinkedHashMap<String, String>> rowListValue = new ArrayList<>();
-                LinkedHashMap<String, String> cellHashMap = null;
+                //excel首行标题
+                excelTitles = getExcelTitle(sheet, excelTitles, excelData.getExportStartRowNum());
 
                 int irow = 1;
-                //第n个工作表:从开始获取数据、默认第一行开始获取。
-                if (!CollectionUtils.isEmpty(excelReadDataList) && excelReadDataList.get(k + 1) != null) {
-                    irow = Integer.valueOf(excelReadDataList.get(k + 1).getRowNum().toString()) - 1;
+                //第k个工作表:从开始获取数据、默认第一行开始获取。
+                if (!CollectionUtils.isEmpty(excelData.getExcelReadDataList()) && excelData.getExcelReadDataList().get(k + 1) != null) {
+                    irow = Integer.valueOf(excelData.getExcelReadDataList().get(k + 1).getRowNum().toString()) - 1;
                 }
-                //第n个工作表:数据获取。
+                //第k个工作表:数据获取。
                 for (int i = irow; i < rowCount; i++) {
+                    try {
+                        object = excelClass.newInstance();
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        throw new Exception("Excel model init failure, " + e.getMessage());
+                    }
                     valueRow = sheet.getRow(i);
                     if (valueRow == null) {
                         continue;
                     }
-                    cellHashMap = new LinkedHashMap<>();
-                    //第n个工作表:获取列数据。
+                    //第k个工作表:获取列数据。
                     for (int j = 0; j < valueRow.getLastCellNum(); j++) {
-                        cellHashMap.put(Integer.toString(j), getCellVal(valueRow.getCell(j), excelData));
+                        Field field = hasAnnotationFieldMap.get(excelTitles.get(j));
+                        if (field == null) {
+                            throw new Exception();
+                        }
+                        BeanUtils.setFieldValue(object, field, getCellVal(valueRow.getCell(j), excelData));
                     }
-                    if (cellHashMap.size() > 0) {
-                        rowListValue.add(cellHashMap);
-                    }
+                    returnDataList.add(object);
                 }
-                returnDataList.add(rowListValue);
             }
             log.info("===> Excel tool class export run time:" + (System.currentTimeMillis() - startTime) + " ms!");
             return returnDataList;
@@ -123,6 +126,30 @@ public class ExcelOperations {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * 获取excel首行的标题
+     * @param sheet
+     * @param excelTitles
+     * @param startRowNum
+     * @return java.util.List<java.lang.String>
+     * @author zengxueqi
+     * @since 2020/5/8
+     */
+    public static List<String> getExcelTitle(Sheet sheet, List<String> excelTitles, Integer startRowNum) {
+        //获取第一行
+        Row titlerow = sheet.getRow(startRowNum);
+        //有多少列
+        int cellNum = titlerow.getLastCellNum();
+        for (int i = 0; i < cellNum; i++) {
+            //根据索引获取对应的列
+            Cell cell = titlerow.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+            //设置列的类型是字符串
+            cell.setCellType(CellType.STRING);
+            excelTitles.add(cell.getStringCellValue());
+        }
+        return excelTitles;
     }
 
     /**
