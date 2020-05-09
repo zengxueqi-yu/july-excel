@@ -6,6 +6,7 @@ import com.july.excel.utils.DateUtils;
 import com.july.excel.utils.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
@@ -21,16 +22,18 @@ public class ExcelFactory {
 
     /**
      * 导入excel信息
-     * @param inputStream
+     * @param file
      * @param excelClass
      * @return java.util.List<java.util.List < java.util.LinkedHashMap < java.lang.String, java.lang.String>>>
      * @author zengxueqi
      * @since 2020/5/7
      */
-    public static <R> List<R> importExcelData(InputStream inputStream, Class<R> excelClass, ExcelData excelData) throws Exception {
-        try (Workbook workbook = WorkbookFactory.create(inputStream)) {
-            return ExcelOperations.importForExcelData(workbook, excelClass, excelData);
+    public static <R> List<R> importExcelData(MultipartFile file, Class<R> excelClass, ExcelData excelData) throws Exception {
+        String fileName = file.getOriginalFilename();
+        if (!fileName.matches("^.+\\.(?i)(xls)$") && !fileName.matches("^.+\\.(?i)(xlsx)$")) {
+            throw new Exception("上传文件格式不正确！");
         }
+        return ExcelOperations.importForExcelData(file, excelClass, excelData);
     }
 
     /**

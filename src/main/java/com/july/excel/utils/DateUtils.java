@@ -38,26 +38,22 @@ public class DateUtils {
     /**
      * 字符串日期转为指定格式的字符串日期
      * @param strDate
-     * @param style
      * @param expectDateFormatStr
      * @return java.lang.String
      * @author zengxueqi
      * @since 2020/5/6
      */
-    public static String strToDateFormat(String strDate, String style, String expectDateFormatStr) {
+    public static String strToDateFormat(String strDate, String expectDateFormatStr) {
         Date date = null;
-        if (style == null) {
-            style = "yyyy-MM-dd";
-        }
         //日期字符串转成date类型
-        SimpleDateFormat formatter = new SimpleDateFormat(style);
+        SimpleDateFormat formatter = new SimpleDateFormat(expectDateFormatStr);
         try {
             date = formatter.parse(strDate);
         } catch (Exception e) {
             return null;
         }
         //转成指定的日期格式
-        SimpleDateFormat sdf = new SimpleDateFormat(expectDateFormatStr == null ? style : expectDateFormatStr);
+        SimpleDateFormat sdf = new SimpleDateFormat(expectDateFormatStr);
         String str = sdf.format(date);
         return str;
     }

@@ -1,6 +1,9 @@
 package com.july.excel.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * excel读取数据信息
@@ -9,6 +12,9 @@ import lombok.Data;
  * @since 2020-05-07 10:27
  **/
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class ExcelReadData {
 
     /**

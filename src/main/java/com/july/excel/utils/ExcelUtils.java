@@ -105,7 +105,7 @@ public class ExcelUtils {
         CellStyle cellTitleStyle = sxssfWorkbook.createCellStyle();
         ExcelStyleUtils.setCellTitleStyle(cellTitleStyle, font, excelData.getIndexedColors());
         for (int i = 0; i < excelFields.size(); i++) {
-            sxssfSheet.setColumnWidth(i, excelData.getCellWidth());
+            sxssfSheet.setColumnWidth(i, excelData.getCellWidth() * ExcelGlobalConstants.EXCEL_WIDTH_UNIT);
 
             Field field = excelFields.get(i);
             ExcelField excelField = field.getAnnotation(ExcelField.class);

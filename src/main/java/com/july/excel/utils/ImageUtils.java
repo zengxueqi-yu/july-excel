@@ -1,14 +1,27 @@
 package com.july.excel.utils;
 
+import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
+import org.apache.poi.hssf.usermodel.HSSFPicture;
+import org.apache.poi.hssf.usermodel.HSSFShape;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.ooxml.POIXMLDocumentPart;
+import org.apache.poi.ss.usermodel.Drawing;
+import org.apache.poi.ss.usermodel.PictureData;
+import org.apache.poi.ss.usermodel.Shape;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFDrawing;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.*;
+import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTMarker;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -72,6 +85,57 @@ public class ImageUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 获取图片和位置 (xls)
+     * @param sheet
+     * @return java.util.Map<java.lang.String, org.apache.poi.ss.usermodel.PictureData>
+     * @author zengxueqi
+     * @since 2020/5/9
+     */
+    public static Map<String, PictureData> getPictures1(HSSFSheet sheet) throws IOException {
+        Map<String, PictureData> map = new HashMap<>();
+        if (sheet.getDrawingPatriarch() != null) {
+            List<HSSFShape> list = sheet.getDrawingPatriarch().getChildren();
+            for (HSSFShape shape : list) {
+                if (shape instanceof HSSFPicture) {
+                    HSSFPicture picture = (HSSFPicture) shape;
+                    HSSFClientAnchor cAnchor = (HSSFClientAnchor) picture.getAnchor();
+                    PictureData pdata = picture.getPictureData();
+                    /**行号-列号**/
+                    String key = cAnchor.getRow1() + "-" + cAnchor.getCol1();
+                    map.put(key, pdata);
+                }
+            }
+        }
+        return map;
+    }
+
+    /**
+     * 获取图片和位置 (xlsx)
+     * @param sheet
+     * @return java.util.Map<java.lang.String, org.apache.poi.ss.usermodel.PictureData>
+     * @author zengxueqi
+     * @since 2020/5/9
+     */
+    public static Map<String, PictureData> getPictures2(XSSFSheet sheet) throws IOException {
+        Map<String, PictureData> map = new HashMap<String, PictureData>();
+        List<POIXMLDocumentPart> list = sheet.getRelations();
+        for (POIXMLDocumentPart part : list) {
+            if (part instanceof XSSFDrawing) {
+                XSSFDrawing drawing = (XSSFDrawing) part;
+                List<XSSFShape> shapes = drawing.getShapes();
+                for (XSSFShape shape : shapes) {
+                    XSSFPicture picture = (XSSFPicture) shape;
+                    XSSFClientAnchor anchor = picture.getPreferredSize();
+                    CTMarker marker = anchor.getFrom();
+                    String key = marker.getRow() + "-" + marker.getCol();
+                    map.put(key, picture.getPictureData());
+                }
+            }
+        }
+        return map;
     }
 
 }
