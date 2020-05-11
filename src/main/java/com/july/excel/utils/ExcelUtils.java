@@ -13,8 +13,6 @@ import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFDataValidation;
 import org.apache.poi.xssf.usermodel.XSSFFont;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
@@ -33,8 +31,6 @@ import static org.apache.poi.ss.util.CellUtil.createCell;
  * @since 2020-05-06 17:42
  **/
 public class ExcelUtils {
-
-    private static Logger log = LoggerFactory.getLogger(ExcelUtils.class);
 
     /**
      * 流操作
@@ -147,7 +143,7 @@ public class ExcelUtils {
                 outputStream.close();
             }
         } catch (Exception e) {
-            throw BnException.on("===> Exception Message：Output stream is not empty !");
+            throw BnException.on("Exception Message：Output stream is not empty !");
         }
     }
 

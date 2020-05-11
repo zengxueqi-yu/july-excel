@@ -118,7 +118,7 @@ public class ExcelOperations {
                     try {
                         object = excelClass.newInstance();
                     } catch (InstantiationException | IllegalAccessException e) {
-                        throw BnException.on("Excel model init failure, " + e.getMessage());
+                        throw BnException.on("Exception Message：Excel model init failure, " + e.getMessage());
                     }
                     valueRow = sheet.getRow(i);
                     if (valueRow == null) {
