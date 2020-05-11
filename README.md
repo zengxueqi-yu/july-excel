@@ -6,7 +6,7 @@
 <dependency>
     <groupId>com.github.zengxueqi-yu</groupId>
     <artifactId>july-excel</artifactId>
-    <version>0.0.1-RELEASE</version>
+    <version>0.0.2-RELEASE</version>
 </dependency>
 ```
 ##### 第二步：控制器使用Excel工具类实现Excel操作

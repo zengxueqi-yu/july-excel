@@ -1,17 +1,12 @@
 package com.july.excel.excel;
 
-import com.july.excel.constant.ExcelGlobalConstants;
 import com.july.excel.entity.ExcelData;
-import com.july.excel.entity.ExcelReadData;
 import com.july.excel.exception.BnException;
 import com.july.excel.utils.DateUtils;
 import com.july.excel.utils.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -48,8 +43,6 @@ public class ExcelFactory {
     public static void exportExcelData(ExcelData excelData, Class<?> excelClass, HttpServletResponse httpServletResponse) {
         String fileName = StringUtils.isEmpty(excelData.getFileName()) ? "excel-" + DateUtils.getDateFormatStr() : excelData.getFileName();
         excelData.setFileName(fileName);
-        //必填项--sheet名称（如果是多表格导出、sheetName也要是多个值！）
-        excelData.setSheetName(excelData.getSheetName() == null ? ExcelGlobalConstants.EXCEL_SHEET_DEFAULT : excelData.getSheetName());
         ExcelOperations.exportForExcelsOptimize(excelData, excelClass, httpServletResponse);
     }
 

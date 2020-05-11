@@ -127,7 +127,7 @@ public class ExcelOperations {
                     //第k个工作表:获取列数据。
                     for (int j = 0; j < valueRow.getLastCellNum(); j++) {
                         Field field = hasAnnotationFieldMap.get(excelTitles.get(j));
-                        BnException.of(field == null,"excel标题解析失败！");
+                        BnException.of(field == null, "excel标题解析失败！");
                         BeanUtils.setFieldValue(object, field, getCellVal(valueRow.getCell(j), excelData));
                     }
                     returnDataList.add(object);
