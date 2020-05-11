@@ -4,6 +4,7 @@ import com.july.excel.constant.ExcelGlobalConstants;
 import com.july.excel.entity.ExcelData;
 import com.july.excel.entity.ExcelDropDown;
 import com.july.excel.entity.ExcelField;
+import com.july.excel.exception.BnException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.streaming.SXSSFDrawing;
@@ -69,12 +70,8 @@ public class ExcelUtils {
      * @since 2020/5/6
      */
     public static void setDataList(SXSSFWorkbook sxssfWorkbook, SXSSFRow sxssfRow, ExcelData excelData, List<Field> excelFields) {
-        if (CollectionUtils.isEmpty(excelData.getExcelData())) {
-            log.debug("===> Exception Message：Export data(type:List<List<String[]>>) cannot be empty!");
-        }
-        if (excelData.getSheetName() == null) {
-            log.debug("===> Exception Message：Export sheet(type:String[]) name cannot be empty!");
-        }
+        BnException.of(CollectionUtils.isEmpty(excelData.getExcelData()), "Exception Message：Export data(type:List<Object>>) cannot be empty!");
+        BnException.of(excelData.getSheetName() == null, "Exception Message：Export sheet(type:String[]) name cannot be empty!");
         int k = 0;
         SXSSFSheet sxssfSheet = sxssfWorkbook.createSheet();
         sxssfWorkbook.setSheetName(k, excelData.getSheetName());
@@ -150,8 +147,7 @@ public class ExcelUtils {
                 outputStream.close();
             }
         } catch (Exception e) {
-            log.info("===> Exception Message：Output stream is not empty !");
-            e.getSuppressed();
+            throw BnException.on("===> Exception Message：Output stream is not empty !");
         }
     }
 

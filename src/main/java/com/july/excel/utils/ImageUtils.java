@@ -1,5 +1,6 @@
 package com.july.excel.utils;
 
+import com.july.excel.exception.BnException;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.hssf.usermodel.HSSFPicture;
 import org.apache.poi.hssf.usermodel.HSSFShape;
@@ -80,10 +81,8 @@ public class ImageUtils {
                 anchor.setAnchorType(DONT_MOVE_AND_RESIZE);
                 sxssfDrawing.createPicture(anchor, sxssfWorkbook.addPicture(data, XSSFWorkbook.PICTURE_TYPE_JPEG));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw BnException.on("excel图片解析失败！");
         }
     }
 

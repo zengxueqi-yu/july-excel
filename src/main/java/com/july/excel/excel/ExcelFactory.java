@@ -1,7 +1,9 @@
 package com.july.excel.excel;
 
+import com.july.excel.constant.ExcelGlobalConstants;
 import com.july.excel.entity.ExcelData;
 import com.july.excel.entity.ExcelReadData;
+import com.july.excel.exception.BnException;
 import com.july.excel.utils.DateUtils;
 import com.july.excel.utils.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -30,9 +32,7 @@ public class ExcelFactory {
      */
     public static <R> List<R> importExcelData(MultipartFile file, Class<R> excelClass, ExcelData excelData) throws Exception {
         String fileName = file.getOriginalFilename();
-        if (!fileName.matches("^.+\\.(?i)(xls)$") && !fileName.matches("^.+\\.(?i)(xlsx)$")) {
-            throw new Exception("上传文件格式不正确！");
-        }
+        BnException.of(!fileName.matches("^.+\\.(?i)(xls)$") && !fileName.matches("^.+\\.(?i)(xlsx)$"), "上传文件格式不正确！");
         return ExcelOperations.importForExcelData(file, excelClass, excelData);
     }
 
@@ -48,9 +48,8 @@ public class ExcelFactory {
     public static void exportExcelData(ExcelData excelData, Class<?> excelClass, HttpServletResponse httpServletResponse) {
         String fileName = StringUtils.isEmpty(excelData.getFileName()) ? "excel-" + DateUtils.getDateFormatStr() : excelData.getFileName();
         excelData.setFileName(fileName);
-        String sheetName = "sheet1";
         //必填项--sheet名称（如果是多表格导出、sheetName也要是多个值！）
-        excelData.setSheetName(excelData.getSheetName() == null ? sheetName : excelData.getSheetName());
+        excelData.setSheetName(excelData.getSheetName() == null ? ExcelGlobalConstants.EXCEL_SHEET_DEFAULT : excelData.getSheetName());
         ExcelOperations.exportForExcelsOptimize(excelData, excelClass, httpServletResponse);
     }
 

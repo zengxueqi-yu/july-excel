@@ -15,8 +15,14 @@ import java.util.Set;
  **/
 public class DynamicBean {
 
-    private Object object = null; //动态生成的类
-    private BeanMap beanMap = null; //存放属性名称以及属性的类型
+    /**
+     * 动态生成的类
+     */
+    private Object object = null;
+    /**
+     * 存放属性名称以及属性的类型
+     */
+    private BeanMap beanMap = null;
 
     public DynamicBean() {
         super();
@@ -40,7 +46,6 @@ public class DynamicBean {
         }
         return generator.create();
     }
-
     /**
      * 给bean属性赋值
      * @param property 属性名
