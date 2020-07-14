@@ -1,4 +1,4 @@
-package com.july.excel.entity;
+package com.july.excel.property;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,6 +1,6 @@
 package com.july.excel.utils;
 
-import com.july.excel.entity.ExcelRegion;
+import com.july.excel.property.ExcelRegion;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFRow;

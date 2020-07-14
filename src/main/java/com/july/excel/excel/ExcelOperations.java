@@ -1,9 +1,9 @@
 package com.july.excel.excel;
 
 import com.july.excel.constant.ExcelGlobalConstants;
-import com.july.excel.entity.ExcelData;
-import com.july.excel.entity.ExcelField;
-import com.july.excel.entity.ExcelReadData;
+import com.july.excel.property.ExcelData;
+import com.july.excel.property.ExcelField;
+import com.july.excel.property.ExcelReadData;
 import com.july.excel.exception.BnException;
 import com.july.excel.utils.*;
 import lombok.extern.slf4j.Slf4j;

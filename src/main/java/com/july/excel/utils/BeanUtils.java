@@ -1,6 +1,6 @@
 package com.july.excel.utils;
 
-import com.july.excel.entity.ExcelField;
+import com.july.excel.property.ExcelField;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

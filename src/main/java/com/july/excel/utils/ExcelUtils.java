@@ -1,9 +1,9 @@
 package com.july.excel.utils;
 
 import com.july.excel.constant.ExcelGlobalConstants;
-import com.july.excel.entity.ExcelData;
-import com.july.excel.entity.ExcelDropDown;
-import com.july.excel.entity.ExcelField;
+import com.july.excel.property.ExcelData;
+import com.july.excel.property.ExcelDropDown;
+import com.july.excel.property.ExcelField;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.streaming.SXSSFDrawing;

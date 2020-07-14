@@ -1,15 +1,11 @@
 package com.july.excel.excel;
 
-import com.july.excel.entity.ExcelData;
-import com.july.excel.entity.ExcelReadData;
+import com.july.excel.property.ExcelData;
 import com.july.excel.utils.DateUtils;
 import com.july.excel.utils.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.InputStream;
 import java.util.List;
 
 /**
