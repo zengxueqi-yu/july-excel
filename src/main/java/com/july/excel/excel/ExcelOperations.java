@@ -118,7 +118,7 @@ public class ExcelOperations {
                     try {
                         object = excelClass.newInstance();
                     } catch (InstantiationException | IllegalAccessException e) {
-                        throw new Exception("Excel model init failure, " + e.getMessage());
+                        throw BnException.on("Exception Message：Excel model init failure, " + e.getMessage());
                     }
                     valueRow = sheet.getRow(i);
                     if (valueRow == null) {
@@ -127,9 +127,7 @@ public class ExcelOperations {
                     //第k个工作表:获取列数据。
                     for (int j = 0; j < valueRow.getLastCellNum(); j++) {
                         Field field = hasAnnotationFieldMap.get(excelTitles.get(j));
-                        if (field == null) {
-                            throw new Exception();
-                        }
+                        BnException.of(field == null, "excel标题解析失败！");
                         BeanUtils.setFieldValue(object, field, getCellVal(valueRow.getCell(j), excelData));
                     }
                     returnDataList.add(object);
@@ -137,9 +135,7 @@ public class ExcelOperations {
             }
             return returnDataList;
         } catch (Exception e) {
-            log.debug("===> Exception Message：Excel tool class export exception !");
-            e.printStackTrace();
-            return null;
+            throw BnException.on("Exception Message：Excel tool class export exception !");
         }
     }
 

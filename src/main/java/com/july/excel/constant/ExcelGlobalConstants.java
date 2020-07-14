@@ -13,5 +13,6 @@ public class ExcelGlobalConstants {
     public static final Integer MAX_ROWSUM = 1048570;
     public static final Integer DATE_LENGTH = 10;
     public static final Integer EXCEL_WIDTH_UNIT = 256;
+    public static final String EXCEL_SHEET_DEFAULT = "sheet1";
 
 }
